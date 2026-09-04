@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ConfigModule } from '@nestjs/config';
+import { StudentsModule } from './students/students.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -21,7 +22,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       serviceId: 'student-management-api',
     }),
     AuthModule,
-    PrismaModule
+    PrismaModule,
+    StudentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

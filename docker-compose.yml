@@ -25,5 +25,29 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: student-management-api
+
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/student_management?schema=public
+      JWT_SECRET: replace-this-in-production
+      JWT_EXPIRES_IN: 15m
+      CORS_ORIGIN: http://localhost:3000
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:

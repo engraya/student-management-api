@@ -5,10 +5,13 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: student_management
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+    # Keep this for local development.
+    # Remove it from the production Compose configuration
+    # if PostgreSQL should not be accessible from the host.
     ports:
       - "5432:5432"
 
@@ -19,11 +22,12 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U postgres -d student_management"
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
         ]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 10s
 
   api:
     build:
@@ -31,16 +35,15 @@ services:
       dockerfile: Dockerfile
 
     container_name: student-management-api
-
     restart: unless-stopped
 
     environment:
-      NODE_ENV: production
-      PORT: 3000
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/student_management?schema=public
-      JWT_SECRET: replace-this-in-production
-      JWT_EXPIRES_IN: 15m
-      CORS_ORIGIN: http://localhost:3000
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      CORS_ORIGIN: ${CORS_ORIGIN}
 
     ports:
       - "3000:3000"

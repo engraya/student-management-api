@@ -3,6 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { UsersModule } from './users/users.module.js';
+import { AuditModule } from './audit/audit.module.js';
+import { MailModule } from './common/mail/mail.module.js';
 import { StudentsModule } from './students/students.module.js';
 import { HealthModule } from './health/health.module.js';
 import * as Joi from 'joi';
@@ -47,9 +50,12 @@ import * as Joi from 'joi';
     ]),
 
     PrismaModule,
+    MailModule,
     AuthModule,
     StudentsModule,
     HealthModule,
+    UsersModule,
+    AuditModule,
   ],
 })
 export class AppModule {}

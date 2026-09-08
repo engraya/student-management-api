@@ -569,20 +569,8 @@ export type StudentSumOrderByAggregateInput = {
   level?: Prisma.SortOrder
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type EnumGenderFieldUpdateOperationsInput = {
   set?: $Enums.Gender
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type EnumStudentStatusFieldUpdateOperationsInput = {

@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -22,6 +22,8 @@ import { QueryUserDto } from './dto/query-user.dto.js';
 import { ChangeUserRoleDto } from './dto/change-user-role.dto.js';
 import { ChangeUserStatusDto } from './dto/change-user-status.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
+
+type AuthenticatedRequest = Request & { user: Express.User };
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -44,20 +46,20 @@ export class UsersController {
 
   @Post()
   @Roles('ADMIN')
-  create(@Body() dto: CreateUserDto, @Req() req: Request) {
-    return this.usersService.create(dto, req.user?.['userId']);
+  create(@Body() dto: CreateUserDto, @Req() req: AuthenticatedRequest) {
+    return this.usersService.create(dto, req.user.userId);
   }
 
   @Patch(':id')
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto, @Req() req: Request) {
-    return this.usersService.update(id, dto, req.user?.['userId']);
+  update(@Param('id') id: string, @Body() dto: UpdateUserDto, @Req() req: AuthenticatedRequest) {
+    return this.usersService.update(id, dto, req.user.userId);
   }
 
   @Delete(':id')
   @Roles('ADMIN')
-  remove(@Param('id') id: string, @Req() req: Request) {
-    return this.usersService.remove(id, req.user?.['userId']);
+  remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    return this.usersService.remove(id, req.user.userId);
   }
 
   @Patch(':id/role')
@@ -65,9 +67,9 @@ export class UsersController {
   changeRole(
     @Param('id') id: string,
     @Body() dto: ChangeUserRoleDto,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
-    return this.usersService.changeRole(id, dto, req.user?.['userId']);
+    return this.usersService.changeRole(id, dto, req.user.userId);
   }
 
   @Patch(':id/status')
@@ -75,13 +77,13 @@ export class UsersController {
   changeStatus(
     @Param('id') id: string,
     @Body() dto: ChangeUserStatusDto,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
-    return this.usersService.changeStatus(id, dto, req.user?.['userId']);
+    return this.usersService.changeStatus(id, dto, req.user.userId);
   }
 
   @Post('me/change-password')
-  changePassword(@Req() req: Request, @Body() dto: ChangePasswordDto) {
-    return this.usersService.changePassword(req.user?.['userId'], dto);
+  changePassword(@Req() req: AuthenticatedRequest, @Body() dto: ChangePasswordDto) {
+    return this.usersService.changePassword(req.user.userId, dto);
   }
 }

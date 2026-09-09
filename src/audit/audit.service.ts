@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 export interface AuditRecordInput {
@@ -6,7 +7,7 @@ export interface AuditRecordInput {
   action: string;
   entity: string;
   entityId?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Prisma.InputJsonValue;
   ipAddress?: string;
   userAgent?: string;
 }

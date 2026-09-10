@@ -11,7 +11,7 @@ import { AuditModule } from '../audit/audit.module.js';
 @Module({
   imports: [
     ConfigModule,
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     AuditModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -34,6 +34,6 @@ import { AuditModule } from '../audit/audit.module.js';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  exports: [AuthService, PassportModule],
 })
 export class AuthModule {}

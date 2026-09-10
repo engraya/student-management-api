@@ -8,7 +8,7 @@ import { AuditModule } from './audit/audit.module.js';
 import { MailModule } from './common/mail/mail.module.js';
 import { StudentsModule } from './students/students.module.js';
 import { HealthModule } from './health/health.module.js';
-import * as Joi from 'joi';
+import Joi from 'joi';
 
 
 @Module({

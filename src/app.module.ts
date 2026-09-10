@@ -39,6 +39,27 @@ import Joi from 'joi';
 
           CORS_ORIGIN: Joi.string()
             .required(),
+
+          SMTP_HOST: Joi.string()
+            .required(),
+
+          SMTP_PORT: Joi.number()
+            .port()
+            .default(587),
+
+          SMTP_USER: Joi.string()
+            .required(),
+
+          SMTP_PASSWORD: Joi.string()
+            .required(),
+
+          EMAIL_FROM: Joi.string()
+            .email()
+            .required(),
+
+          FRONTEND_URL: Joi.string()
+            .uri()
+            .required(),
         }),
       }),
 

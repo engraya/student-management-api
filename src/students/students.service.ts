@@ -15,8 +15,27 @@ import { QueryStudentDto } from './dto/query-student.dto.js';
 export class StudentsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async getDepartment(name: string) {
+    const department = await this.prisma.department.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (!department) {
+      throw new NotFoundException('Department not found');
+    }
+
+    return department;
+  }
+
   async create(dto: CreateStudentDto) {
     try {
+      const department = await this.getDepartment(dto.department);
+
       return await this.prisma.student.create({
         data: {
           studentNumber: dto.studentNumber,
@@ -27,7 +46,9 @@ export class StudentsService {
           phone: dto.phone,
           dateOfBirth: new Date(dto.dateOfBirth),
           gender: dto.gender,
-          department: dto.department,
+          department: {
+            connect: { id: department.id },
+          },
           level: dto.level,
           address: dto.address,
         },
@@ -78,8 +99,12 @@ export class StudentsService {
     const where: Prisma.StudentWhereInput = {
       ...(department && {
         department: {
-          contains: department,
-          mode: 'insensitive',
+          is: {
+            name: {
+              contains: department,
+              mode: 'insensitive',
+            },
+          },
         },
       }),
 
@@ -124,9 +149,10 @@ export class StudentsService {
         where,
         skip,
         take: limit,
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        orderBy:
+          sortBy === 'department'
+            ? { department: { name: sortOrder as Prisma.SortOrder } }
+            : { [sortBy]: sortOrder },
       }),
       this.prisma.student.count({ where }),
     ]);
@@ -188,7 +214,9 @@ export class StudentsService {
             gender: dto.gender,
           }),
           ...(dto.department !== undefined && {
-            department: dto.department,
+            department: {
+              connect: { id: (await this.getDepartment(dto.department)).id },
+            },
           }),
           ...(dto.level !== undefined && {
             level: dto.level,

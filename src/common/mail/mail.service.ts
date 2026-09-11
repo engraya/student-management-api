@@ -4,43 +4,36 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
-  private readonly transporter;
+  private transporter: nodemailer.Transporter;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      host: this.config.getOrThrow<string>('SMTP_HOST'),
-      port: Number(this.config.get<string>('SMTP_PORT') ?? 587),
-      secure: Number(this.config.get<string>('SMTP_PORT') ?? 587) === 465,
+      host: this.configService.get<string>('SMTP_HOST'),
+      port: this.configService.get<number>('SMTP_PORT'),
       auth: {
-        user: this.config.getOrThrow<string>('SMTP_USER'),
-        pass: this.config.getOrThrow<string>('SMTP_PASSWORD'),
+        user: this.configService.get<string>('SMTP_USER'),
+        pass: this.configService.get<string>('SMTP_PASSWORD'),
       },
     });
   }
 
   async sendPasswordResetEmail(to: string, token: string) {
-    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
-    const from = this.config.getOrThrow<string>('EMAIL_FROM');
-    const link = `${frontendUrl}/reset-password?token=${encodeURIComponent(token)}`;
-
+    const url = `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${token}`;
     await this.transporter.sendMail({
-      from,
+      from: this.configService.get<string>('EMAIL_FROM'),
       to,
       subject: 'Reset your password',
-      text: `Use this link to reset your password: ${link}`,
+      html: `<p>Click <a href="${url}">here</a> to reset your password. This link expires in 15 minutes.</p>`,
     });
   }
 
   async sendVerificationEmail(to: string, token: string) {
-    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
-    const from = this.config.getOrThrow<string>('EMAIL_FROM');
-    const link = `${frontendUrl}/verify-email?token=${encodeURIComponent(token)}`;
-
+    const url = `${this.configService.get<string>('FRONTEND_URL')}/verify-email?token=${token}`;
     await this.transporter.sendMail({
-      from,
+      from: this.configService.get<string>('EMAIL_FROM'),
       to,
-      subject: 'Verify your email address',
-      text: `Use this link to verify your email address: ${link}`,
+      subject: 'Verify your email',
+      html: `<p>Click <a href="${url}">here</a> to verify your email. This link expires in 30 minutes.</p>`,
     });
   }
 }

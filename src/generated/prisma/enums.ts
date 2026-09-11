@@ -34,3 +34,40 @@ export const StudentStatus = {
 } as const
 
 export type StudentStatus = (typeof StudentStatus)[keyof typeof StudentStatus]
+
+
+export const SemesterName = {
+  FIRST: 'FIRST',
+  SECOND: 'SECOND'
+} as const
+
+export type SemesterName = (typeof SemesterName)[keyof typeof SemesterName]
+
+
+export const RegistrationStatus = {
+  REGISTERED: 'REGISTERED',
+  DROPPED: 'DROPPED'
+} as const
+
+export type RegistrationStatus = (typeof RegistrationStatus)[keyof typeof RegistrationStatus]
+
+
+export const Grade = {
+  A: 'A',
+  B: 'B',
+  C: 'C',
+  D: 'D',
+  E: 'E',
+  F: 'F'
+} as const
+
+export type Grade = (typeof Grade)[keyof typeof Grade]
+
+
+export const AttendanceStatus = {
+  PRESENT: 'PRESENT',
+  ABSENT: 'ABSENT',
+  EXCUSED: 'EXCUSED'
+} as const
+
+export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus]

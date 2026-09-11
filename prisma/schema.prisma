@@ -8,6 +8,10 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────
+
 enum Role {
   ADMIN
   STAFF
@@ -25,6 +29,35 @@ enum StudentStatus {
   GRADUATED
   SUSPENDED
 }
+
+enum SemesterName {
+  FIRST
+  SECOND
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  DROPPED
+}
+
+enum Grade {
+  A
+  B
+  C
+  D
+  E
+  F
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+}
+
+// ─────────────────────────────────────────────────────────
+// Users & Security
+// ─────────────────────────────────────────────────────────
 
 model User {
   id                  String    @id @default(uuid())
@@ -44,6 +77,7 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   auditLogs               AuditLog[]
+  attendanceRecords       Attendance[]             @relation("AttendanceRecordedBy")
 
   @@index([email])
   @@index([role])
@@ -107,6 +141,10 @@ model AuditLog {
   @@index([createdAt])
 }
 
+// ─────────────────────────────────────────────────────────
+// Students
+// ─────────────────────────────────────────────────────────
+
 model Student {
   id            String        @id @default(uuid())
   studentNumber String        @unique
@@ -117,16 +155,186 @@ model Student {
   phone         String?
   dateOfBirth   DateTime
   gender        Gender
-  department    String
   level         Int
   address       String?
   status        StudentStatus @default(ACTIVE)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  registrations CourseRegistration[]
+  results       Result[]
+  attendance    Attendance[]
+
   @@index([lastName])
-  @@index([department])
+  @@index([departmentId])
   @@index([status])
   @@index([gender])
   @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────
+// Academic structure: Faculty → Department → Course
+// ─────────────────────────────────────────────────────────
+
+model Faculty {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  departments Department[]
+
+  @@index([name])
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  facultyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  faculty  Faculty   @relation(fields: [facultyId], references: [id])
+  courses  Course[]
+  students Student[]
+
+  @@unique([facultyId, name])
+  @@index([facultyId])
+}
+
+model Course {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  title        String
+  description  String?
+  creditUnits  Int
+  level        Int
+  semesterName SemesterName
+  isElective   Boolean      @default(false)
+  departmentId String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  department    Department           @relation(fields: [departmentId], references: [id])
+  registrations CourseRegistration[]
+  results       Result[]
+  attendance    Attendance[]
+
+  @@index([departmentId])
+  @@index([level])
+  @@index([semesterName])
+}
+
+// ─────────────────────────────────────────────────────────
+// Academic calendar: Session → Semester
+// ─────────────────────────────────────────────────────────
+
+model Session {
+  id        String   @id @default(uuid())
+  name      String   @unique // e.g. "2025/2026"
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  semesters Semester[]
+
+  @@index([isCurrent])
+}
+
+model Semester {
+  id        String       @id @default(uuid())
+  name      SemesterName
+  sessionId String
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  session       Session              @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  registrations CourseRegistration[]
+  results       Result[]
+  attendance    Attendance[]
+
+  @@unique([sessionId, name])
+  @@index([sessionId])
+  @@index([isCurrent])
+}
+
+// ─────────────────────────────────────────────────────────
+// Course Registration, Results, Attendance
+// ─────────────────────────────────────────────────────────
+
+model CourseRegistration {
+  id           String             @id @default(uuid())
+  studentId    String
+  courseId     String
+  semesterId   String
+  status       RegistrationStatus @default(REGISTERED)
+  registeredAt DateTime           @default(now())
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id])
+  semester Semester @relation(fields: [semesterId], references: [id])
+
+  @@unique([studentId, courseId, semesterId])
+  @@index([studentId])
+  @@index([courseId])
+  @@index([semesterId])
+  @@index([status])
+}
+
+model Result {
+  id         String   @id @default(uuid())
+  studentId  String
+  courseId   String
+  semesterId String
+  caScore    Float
+  examScore  Float
+  totalScore Float
+  grade      Grade
+  gradePoint Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id])
+  semester Semester @relation(fields: [semesterId], references: [id])
+
+  @@unique([studentId, courseId, semesterId])
+  @@index([studentId])
+  @@index([courseId])
+  @@index([semesterId])
+}
+
+model Attendance {
+  id           String           @id @default(uuid())
+  studentId    String
+  courseId     String
+  semesterId   String
+  date         DateTime
+  status       AttendanceStatus
+  recordedById String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course     Course   @relation(fields: [courseId], references: [id])
+  semester   Semester @relation(fields: [semesterId], references: [id])
+  recordedBy User?    @relation("AttendanceRecordedBy", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@unique([studentId, courseId, date])
+  @@index([studentId])
+  @@index([courseId])
+  @@index([semesterId])
+  @@index([date])
 }

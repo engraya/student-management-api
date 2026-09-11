@@ -36,8 +36,48 @@ async function main() {
     },
   });
 
-  await prisma.student.createMany({
-      data: [
+  await prisma.faculty.upsert({
+    where: { code: 'FC' },
+    update: {},
+    create: {
+      id: 'faculty-computing',
+      name: 'Faculty of Computing',
+      code: 'FC',
+    },
+  });
+
+  const departmentIds: Record<string, string> = {
+    'Software Engineering': 'department-software-engineering',
+    'Information Technology': 'department-information-technology',
+    'Computer Science': 'department-computer-science',
+    Cybersecurity: 'department-cybersecurity',
+    'Computer Engineering': 'department-computer-engineering',
+    Medicine: 'department-medicine',
+  };
+
+  const departmentCodes: Record<string, string> = {
+    'Software Engineering': 'SE',
+    'Information Technology': 'IT',
+    'Computer Science': 'CS',
+    Cybersecurity: 'CY',
+    'Computer Engineering': 'CE',
+    Medicine: 'MED',
+  };
+
+  for (const [name, id] of Object.entries(departmentIds)) {
+    await prisma.department.upsert({
+      where: { code: departmentCodes[name] },
+      update: {},
+      create: {
+        id,
+        name,
+        code: departmentCodes[name],
+        facultyId: 'faculty-computing',
+      },
+    });
+  }
+
+  const students = [
         {
           studentNumber: 'STU-0001',
           firstName: 'Ahmad',
@@ -538,7 +578,14 @@ async function main() {
           department: 'Computer Science',
           level: 400,
         },
-      ],
+  ];
+
+  await prisma.student.createMany({
+    data: students.map(({ department, ...student }) => ({
+      ...student,
+      gender: student.gender as 'MALE' | 'FEMALE' | 'OTHER',
+      departmentId: departmentIds[department],
+    })),
     skipDuplicates: true,
   });
 

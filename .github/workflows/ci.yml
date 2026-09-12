@@ -40,6 +40,12 @@ jobs:
       JWT_SECRET: ci-test-secret-that-is-at-least-32-characters-long
       JWT_EXPIRES_IN: 15m
       CORS_ORIGIN: http://localhost:3000
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_USER: ci-test-user
+      SMTP_PASSWORD: ci-test-password
+      EMAIL_FROM: noreply@example.com
+      FRONTEND_URL: http://localhost:3000
 
     steps:
       - name: Checkout repository

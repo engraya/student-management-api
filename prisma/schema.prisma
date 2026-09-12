@@ -180,7 +180,7 @@ model Student {
 // ─────────────────────────────────────────────────────────
 
 model Faculty {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid
   name      String   @unique
   code      String   @unique
   createdAt DateTime @default(now())
@@ -192,10 +192,10 @@ model Faculty {
 }
 
 model Department {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid
   name      String
   code      String   @unique
-  facultyId String
+  facultyId String   @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -216,7 +216,7 @@ model Course {
   level        Int
   semesterName SemesterName
   isElective   Boolean      @default(false)
-  departmentId String
+  departmentId String        @db.Uuid
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 

@@ -17,6 +17,8 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
+  const facultyId = '11111111-1111-4111-8111-111111111111';
+
   const passwordHash = await bcrypt.hash(
     'Admin12345',
     12,
@@ -40,19 +42,19 @@ async function main() {
     where: { code: 'FC' },
     update: {},
     create: {
-      id: 'faculty-computing',
+      id: facultyId,
       name: 'Faculty of Computing',
       code: 'FC',
     },
   });
 
   const departmentIds: Record<string, string> = {
-    'Software Engineering': 'department-software-engineering',
-    'Information Technology': 'department-information-technology',
-    'Computer Science': 'department-computer-science',
-    Cybersecurity: 'department-cybersecurity',
-    'Computer Engineering': 'department-computer-engineering',
-    Medicine: 'department-medicine',
+    'Software Engineering': '22222222-2222-4222-8222-222222222221',
+    'Information Technology': '22222222-2222-4222-8222-222222222222',
+    'Computer Science': '22222222-2222-4222-8222-222222222223',
+    Cybersecurity: '22222222-2222-4222-8222-222222222224',
+    'Computer Engineering': '22222222-2222-4222-8222-222222222225',
+    Medicine: '22222222-2222-4222-8222-222222222226',
   };
 
   const departmentCodes: Record<string, string> = {
@@ -72,7 +74,7 @@ async function main() {
         id,
         name,
         code: departmentCodes[name],
-        facultyId: 'faculty-computing',
+        facultyId,
       },
     });
   }

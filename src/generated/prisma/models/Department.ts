@@ -184,10 +184,10 @@ export type DepartmentWhereInput = {
   AND?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
   OR?: Prisma.DepartmentWhereInput[]
   NOT?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
-  id?: Prisma.StringFilter<"Department"> | string
+  id?: Prisma.UuidFilter<"Department"> | string
   name?: Prisma.StringFilter<"Department"> | string
   code?: Prisma.StringFilter<"Department"> | string
-  facultyId?: Prisma.StringFilter<"Department"> | string
+  facultyId?: Prisma.UuidFilter<"Department"> | string
   createdAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   faculty?: Prisma.XOR<Prisma.FacultyScalarRelationFilter, Prisma.FacultyWhereInput>
@@ -215,7 +215,7 @@ export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.DepartmentWhereInput[]
   NOT?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
   name?: Prisma.StringFilter<"Department"> | string
-  facultyId?: Prisma.StringFilter<"Department"> | string
+  facultyId?: Prisma.UuidFilter<"Department"> | string
   createdAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   faculty?: Prisma.XOR<Prisma.FacultyScalarRelationFilter, Prisma.FacultyWhereInput>
@@ -239,10 +239,10 @@ export type DepartmentScalarWhereWithAggregatesInput = {
   AND?: Prisma.DepartmentScalarWhereWithAggregatesInput | Prisma.DepartmentScalarWhereWithAggregatesInput[]
   OR?: Prisma.DepartmentScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DepartmentScalarWhereWithAggregatesInput | Prisma.DepartmentScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"Department"> | string
+  id?: Prisma.UuidWithAggregatesFilter<"Department"> | string
   name?: Prisma.StringWithAggregatesFilter<"Department"> | string
   code?: Prisma.StringWithAggregatesFilter<"Department"> | string
-  facultyId?: Prisma.StringWithAggregatesFilter<"Department"> | string
+  facultyId?: Prisma.UuidWithAggregatesFilter<"Department"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Department"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Department"> | Date | string
 }
@@ -540,10 +540,10 @@ export type DepartmentScalarWhereInput = {
   AND?: Prisma.DepartmentScalarWhereInput | Prisma.DepartmentScalarWhereInput[]
   OR?: Prisma.DepartmentScalarWhereInput[]
   NOT?: Prisma.DepartmentScalarWhereInput | Prisma.DepartmentScalarWhereInput[]
-  id?: Prisma.StringFilter<"Department"> | string
+  id?: Prisma.UuidFilter<"Department"> | string
   name?: Prisma.StringFilter<"Department"> | string
   code?: Prisma.StringFilter<"Department"> | string
-  facultyId?: Prisma.StringFilter<"Department"> | string
+  facultyId?: Prisma.UuidFilter<"Department"> | string
   createdAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Department"> | Date | string
 }

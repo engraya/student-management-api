@@ -265,7 +265,7 @@ export type CourseWhereInput = {
   level?: Prisma.IntFilter<"Course"> | number
   semesterName?: Prisma.EnumSemesterNameFilter<"Course"> | $Enums.SemesterName
   isElective?: Prisma.BoolFilter<"Course"> | boolean
-  departmentId?: Prisma.StringFilter<"Course"> | string
+  departmentId?: Prisma.UuidFilter<"Course"> | string
   createdAt?: Prisma.DateTimeFilter<"Course"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Course"> | Date | string
   department?: Prisma.XOR<Prisma.DepartmentScalarRelationFilter, Prisma.DepartmentWhereInput>
@@ -304,7 +304,7 @@ export type CourseWhereUniqueInput = Prisma.AtLeast<{
   level?: Prisma.IntFilter<"Course"> | number
   semesterName?: Prisma.EnumSemesterNameFilter<"Course"> | $Enums.SemesterName
   isElective?: Prisma.BoolFilter<"Course"> | boolean
-  departmentId?: Prisma.StringFilter<"Course"> | string
+  departmentId?: Prisma.UuidFilter<"Course"> | string
   createdAt?: Prisma.DateTimeFilter<"Course"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Course"> | Date | string
   department?: Prisma.XOR<Prisma.DepartmentScalarRelationFilter, Prisma.DepartmentWhereInput>
@@ -344,7 +344,7 @@ export type CourseScalarWhereWithAggregatesInput = {
   level?: Prisma.IntWithAggregatesFilter<"Course"> | number
   semesterName?: Prisma.EnumSemesterNameWithAggregatesFilter<"Course"> | $Enums.SemesterName
   isElective?: Prisma.BoolWithAggregatesFilter<"Course"> | boolean
-  departmentId?: Prisma.StringWithAggregatesFilter<"Course"> | string
+  departmentId?: Prisma.UuidWithAggregatesFilter<"Course"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Course"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Course"> | Date | string
 }
@@ -683,7 +683,7 @@ export type CourseScalarWhereInput = {
   level?: Prisma.IntFilter<"Course"> | number
   semesterName?: Prisma.EnumSemesterNameFilter<"Course"> | $Enums.SemesterName
   isElective?: Prisma.BoolFilter<"Course"> | boolean
-  departmentId?: Prisma.StringFilter<"Course"> | string
+  departmentId?: Prisma.UuidFilter<"Course"> | string
   createdAt?: Prisma.DateTimeFilter<"Course"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Course"> | Date | string
 }

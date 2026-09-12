@@ -177,7 +177,7 @@ export type FacultyWhereInput = {
   AND?: Prisma.FacultyWhereInput | Prisma.FacultyWhereInput[]
   OR?: Prisma.FacultyWhereInput[]
   NOT?: Prisma.FacultyWhereInput | Prisma.FacultyWhereInput[]
-  id?: Prisma.StringFilter<"Faculty"> | string
+  id?: Prisma.UuidFilter<"Faculty"> | string
   name?: Prisma.StringFilter<"Faculty"> | string
   code?: Prisma.StringFilter<"Faculty"> | string
   createdAt?: Prisma.DateTimeFilter<"Faculty"> | Date | string
@@ -221,7 +221,7 @@ export type FacultyScalarWhereWithAggregatesInput = {
   AND?: Prisma.FacultyScalarWhereWithAggregatesInput | Prisma.FacultyScalarWhereWithAggregatesInput[]
   OR?: Prisma.FacultyScalarWhereWithAggregatesInput[]
   NOT?: Prisma.FacultyScalarWhereWithAggregatesInput | Prisma.FacultyScalarWhereWithAggregatesInput[]
-  id?: Prisma.StringWithAggregatesFilter<"Faculty"> | string
+  id?: Prisma.UuidWithAggregatesFilter<"Faculty"> | string
   name?: Prisma.StringWithAggregatesFilter<"Faculty"> | string
   code?: Prisma.StringWithAggregatesFilter<"Faculty"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Faculty"> | Date | string

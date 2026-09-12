@@ -11,6 +11,12 @@ import { HealthModule } from './health/health.module.js';
 import { FacultiesModule } from './academic/faculties/faculties.module.js';
 import { DepartmentsModule } from './academic/departments/departments.module.js';
 import { CoursesModule } from './academic/courses/courses.module.js';
+import { SessionsModule } from './academic/sessions/sessions.module.js';
+import { SemestersModule } from './academic/semesters/semesters.module.js';
+import { RegistrationsModule } from './academic/registrations/registrations.module.js';
+import { ResultsModule } from './academic/results/results.module.js';
+import { GpaModule } from './academic/gpa/gpa.module.js';
+import { AttendanceModule } from './academic/attendance/attendance.module.js';
 import Joi from 'joi';
 
 
@@ -83,6 +89,12 @@ import Joi from 'joi';
     FacultiesModule,
     DepartmentsModule,
     CoursesModule,
+    SessionsModule,
+    SemestersModule,
+    RegistrationsModule,
+    ResultsModule,
+    GpaModule,
+    AttendanceModule,
   ],
 })
 export class AppModule {}

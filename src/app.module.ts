@@ -8,6 +8,9 @@ import { AuditModule } from './audit/audit.module.js';
 import { MailModule } from './common/mail/mail.module.js';
 import { StudentsModule } from './students/students.module.js';
 import { HealthModule } from './health/health.module.js';
+import { FacultiesModule } from './academic/faculties/faculties.module.js';
+import { DepartmentsModule } from './academic/departments/departments.module.js';
+import { CoursesModule } from './academic/courses/courses.module.js';
 import Joi from 'joi';
 
 
@@ -77,6 +80,9 @@ import Joi from 'joi';
     HealthModule,
     UsersModule,
     AuditModule,
+    FacultiesModule,
+    DepartmentsModule,
+    CoursesModule,
   ],
 })
 export class AppModule {}

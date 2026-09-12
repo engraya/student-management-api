@@ -1,61 +1,21 @@
-import {
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
 import { Type } from 'class-transformer';
-
-enum StudentStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  GRADUATED = 'GRADUATED',
-  SUSPENDED = 'SUSPENDED',
-}
-
-enum Gender {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-  OTHER = 'OTHER',
-}
+import {
+  IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min,
+} from 'class-validator';
+import { Gender, StudentStatus } from '../../generated/prisma/client.js';
 
 export class QueryStudentDto {
-  @IsOptional()
-  @IsString()
-  search?: string;
+  @IsOptional() @IsString() search?: string;
+  @IsOptional() @IsUUID() departmentId?: string;
+  @IsOptional() @IsEnum(StudentStatus) status?: StudentStatus;
+  @IsOptional() @IsEnum(Gender) gender?: Gender;
+
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) page = 1;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(100) limit = 20;
 
   @IsOptional()
-  @IsString()
-  department?: string;
+  @IsIn(['createdAt', 'firstName', 'lastName', 'studentNumber', 'level'])
+  sortBy = 'createdAt';
 
-  @IsOptional()
-  @IsEnum(StudentStatus)
-  status?: StudentStatus;
-
-  @IsOptional()
-  @IsEnum(Gender)
-  gender?: Gender;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  page: number = 1;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit: number = 20;
-
-  @IsOptional()
-  @IsString()
-  sortBy: string = 'createdAt';
-
-  @IsOptional()
-  @IsString()
-  sortOrder: string = 'desc';
+  @IsOptional() @IsIn(['asc', 'desc']) sortOrder: 'asc' | 'desc' = 'desc';
 }

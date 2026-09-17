@@ -2,6 +2,18 @@
 
 A REST API for managing student records and academic administration, built with NestJS 12, TypeScript, Prisma 7, and PostgreSQL. It includes staff authentication, academic records, attendance, and GPA calculations.
 
+## Contents
+
+- [Features](#features)
+- [Local setup](#local-setup)
+- [Authentication and API usage](#authentication-and-api-usage)
+- [Docker](#docker)
+- [Development commands](#development-commands)
+- [Project structure](#project-structure)
+- [CI and container publishing](#ci-and-container-publishing)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 ## Features
 
 - JWT authentication with rotating refresh tokens, logout, email verification, and password reset through SMTP.
@@ -132,6 +144,23 @@ Authorization: Bearer <accessToken>
 
 In Swagger UI, select **Authorize** and enter the access token to try protected endpoints.
 
+For a complete login and student-list request in PowerShell:
+
+```powershell
+$loginBody = @{
+  email = 'admin@example.com'
+  password = 'Admin12345'
+} | ConvertTo-Json
+
+$session = Invoke-RestMethod -Method Post `
+  -Uri 'http://localhost:3000/api/v1/auth/login' `
+  -ContentType 'application/json' -Body $loginBody
+
+$authHeaders = @{ Authorization = "Bearer $($session.accessToken)" }
+Invoke-RestMethod -Uri 'http://localhost:3000/api/v1/students?page=1&limit=20' `
+  -Headers $authHeaders
+```
+
 Send `{ "refreshToken": "<refreshToken>" }` to `POST /api/v1/auth/refresh` to receive a new token pair. Refreshing revokes the previous refresh token. Logout uses the same body at `POST /api/v1/auth/logout` and also requires the bearer access token.
 
 Public registration creates a `STAFF` account. Passwords must be 8–100 characters and contain a letter and a number. Verification emails expire after 30 minutes; password-reset links expire after 15 minutes. The current login flow does not require email verification.
@@ -184,9 +213,24 @@ The department UUID above is created by the seed on a fresh database. Optional f
 
 The list response contains `data` and `meta`, including `total`, `page`, `limit`, `totalPages`, `hasNextPage`, and `hasPreviousPage`.
 
+### Academic workflow
+
+Use the returned UUIDs when linking records. A typical setup sequence is:
+
+1. Create a faculty, then a department linked to that faculty.
+2. Create students and courses linked to the department.
+3. Create an academic session and its semesters. Administrators can mark a session or semester current with `PATCH /:id/set-current` on its resource route.
+4. Register a student for a course and semester through `POST /academic/registrations`, supplying `studentId`, `courseId`, and `semesterId`.
+5. Record assessment scores through `POST /academic/results`, or attendance through `POST /academic/attendance`.
+6. Retrieve semester GPA, cumulative GPA, and attendance summaries from the student academic routes listed above.
+
+A registration is unique per student, course, and semester. Dropping it changes its status to `DROPPED`. Results are also unique per student, course, and semester.
+
+Attendance accepts a course UUID, semester UUID, ISO date, and a nonempty `entries` array. Each entry contains a student UUID and a status of `PRESENT`, `ABSENT`, or `EXCUSED`. See the [attendance request DTO](src/academic/attendance/dto/mark-attendance.dto.ts) for the payload definition.
+
 ### Academic grading
 
-Results combine continuous assessment and exam scores. The implemented grade scale is:
+Results accept `caScore` from 0 to 30 and `examScore` from 0 to 70, along with `studentId`, `courseId`, and `semesterId`. The API calculates the total score, grade, and grade points. The implemented grade scale is:
 
 | Minimum total score | Grade | Grade points |
 | ------------------- | ----- | ------------ |
@@ -210,6 +254,20 @@ docker compose up --build -d
 Compose waits for PostgreSQL to become healthy. The API container applies committed migrations before starting; it does not run the seed automatically. The database persists in the `postgres_data` volume.
 
 The bundled configuration publishes API port `3000` and PostgreSQL port `5432`. Keep `PORT=3000` unless you also adjust the API port mapping. Compose constructs the API database URL using the `postgres` service hostname and the `POSTGRES_*` variables. It currently does not forward `REFRESH_TOKEN_DAYS`, so the container uses the 30-day default unless you add that environment entry.
+
+Useful container commands:
+
+```sh
+# Inspect service status and API startup logs
+docker compose ps
+docker compose logs --tail=100 api
+
+# Load development data into the container database
+docker compose exec api npm run prisma:seed
+
+# Stop services while preserving the database volume
+docker compose down
+```
 
 ## Development commands
 
@@ -270,6 +328,36 @@ test/             End-to-end tests
 [CI](.github/workflows/ci.yml) runs on pushes and pull requests to `main` and `develop`. It installs dependencies, generates Prisma, migrates and seeds a PostgreSQL test database, runs lint and unit/end-to-end tests, builds the app, and then checks the Docker image build.
 
 [CD](.github/workflows/cd.yml) builds and publishes the Docker image to GitHub Container Registry on pushes to `main`, with commit SHA and default-branch `latest` tags. It does not deploy the image to a running server.
+
+The workflows run independently: CD does not wait for CI to succeed. Inspect the workflow and commit attached to a failed run in the repository's **Actions** tab; a local test run does not verify registry permissions or publishing.
+
+To repeat the application checks locally, first configure a separate test database and the required environment variables, then run:
+
+```sh
+npm run prisma:generate
+npm run prisma:migrate:deploy
+npm run prisma:seed
+npm run lint
+npm test
+npm run test:e2e
+npm run build
+docker build -t student-management-api:ci .
+```
+
+## Troubleshooting
+
+| Symptom                                                               | What to check                                                                                                                                                                |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Startup reports environment validation errors                         | Supply all required variables in `.env`; `JWT_SECRET` must be at least 32 characters.                                                                                        |
+| Prisma cannot connect or the health endpoint fails                    | Check that PostgreSQL is running and `DATABASE_URL` has the correct host, port, database, and credentials. A host-run API uses `localhost`; the Compose API uses `postgres`. |
+| Tables are missing                                                    | Run `npm run prisma:migrate:deploy` against the same database used by the API.                                                                                               |
+| Generated Prisma imports are missing after checkout or schema changes | Run `npm run prisma:generate` before testing or building.                                                                                                                    |
+| Seeded administrator login fails                                      | Seed the intended database. Reseeding does not change an existing user's password.                                                                                           |
+| Login reports a temporary account lock                                | Five failed attempts trigger a 15-minute lockout.                                                                                                                            |
+| Registration or password-reset email fails                            | Replace the sample SMTP values with working credentials and check the sender address.                                                                                        |
+| Request returns `400`                                                 | Check DTO validation, unknown fields, UUIDs, and referenced records.                                                                                                         |
+| Request returns `401` or `403`                                        | Supply a valid access token and check that the account has the role required by the route.                                                                                   |
+| Request returns `409`                                                 | Check for duplicate unique values, such as student number, email, registration, or result.                                                                                   |
 
 ## License
 
